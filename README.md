@@ -1,75 +1,60 @@
-# React + TypeScript + Vite
+# Proyecto N�4 Front-End
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Descripci�n
+Aplicaci�n React + TypeScript creada con Vite para explorar personajes de la API de Dragon Ball desarrollada por Jesús Bernal  Moreira. El proyecto permite buscar personajes, ver detalles completos, agregar favoritos, editar notas locales y conservar datos en Local Storage.
 
-Currently, two official plugins are available:
+## API utilizada
+- API: `https://dragonball-api.com/api/characters`
+- El proyecto utiliza `fetch` con `async/await` y valida `response.ok`.
+- Los datos recibidos se transforman para adaptarse al modelo interno del proyecto.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Instalaci�n
+1. Clona o descarga el repositorio (https://github.com/ConejusCPU/Evaluaci-n_4_FrontEnd).
+2. Abre la carpeta del proyecto.
+3. Instala dependencias:
+   ```bash
+   npm install
+   ```
+4. Ejecuta la app en modo desarrollo:
+   ```bash
+   npm run dev
+   ```
+5. Para compilar la versi�n de producci�n:
+   ```bash
+   npm run build
+   ```
 
-## React Compiler
+## Funcionalidades
+- Modelo de datos TypeScript con interfaz `Personaje`.
+- Consumo de la API de Dragon Ball con `fetch` y validaci�n `response.ok`.
+- Estados de React implementados: `personajes`, `cargando`, `error`, `busqueda`, `favoritos` y `viewMode`.
+- B�squeda controlada por texto para encontrar personajes por nombre, categor�a o estado.
+- Renderizado en lista o tarjetas reutilizables.
+- Guardado de favoritos en Local Storage.
+- CRUD local en favoritos:
+  - Create: agregar personaje a favoritos.
+  - Read: cargar y mostrar favoritos guardados.
+  - Update: editar notas de favoritos.
+  - Delete: eliminar favoritos.
+- Manejo de errores y estado de carga.
+- Plantillas accesibles con `label`, texto alternativo en im�genes y uso de teclado.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Ejemplo de uso:
+- P�gina principal con buscador y tarjetas de personajes.
+- Detalle del personaje seleccionado mostrando categor�a, estado, raza, afiliaci�n, potencia/Ki y descripci�n.
+- Lista de favoritos con edici�n de notas y eliminaci�n.
 
-## Expanding the ESLint configuration
+## Estructura principal del proyecto
+- `src/App.tsx` � l�gica principal y estados.
+- `src/components/Buscador.tsx` � componente de b�squeda.
+- `src/components/ListaElementos.tsx` � renderizado de lista/tarjetas.
+- `src/components/ElementosCard.tsx` � tarjeta de personaje.
+- `src/components/Favoritos.tsx` � panel de favoritos con CRUD local.
+- `src/services/api.ts` � consumo y transformaci�n de API.
+- `src/types/Elemento.ts` � definici�n de tipos TypeScript.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Notas
+- No se incluyen claves privadas en el repositorio.
+- El proyecto funciona con React 19, Vite y TypeScript.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+---

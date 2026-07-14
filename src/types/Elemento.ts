@@ -5,6 +5,8 @@ export interface Personaje {
   race: string;
   affiliation: string;
   image: string;
+  category: string;
+  status: string;
   description: string;
 }
 
