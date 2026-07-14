@@ -1,122 +1,85 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useEffect, useState } from "react";
+import { obtenerPersonajes } from "./services/api";
+import { Personaje, FavoritoLocal } from "./types/Elemento";
+import Buscador from "./components/Buscador";
+import ListaElementos from "./components/ListaElementos";
+import Favoritos from "./components/Favoritos";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [personajes, setPersonajes] = useState<Personaje[]>([]);
+  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState("");
+  const [busqueda, setBusqueda] = useState("");
+  const [favoritos, setFavoritos] = useState<FavoritoLocal[]>([]);
+
+  const cargarDatos = async () => {
+    try {
+      setCargando(true);
+      setError("");
+      const data = await obtenerPersonajes();
+      setPersonajes(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error inesperado");
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  useEffect(() => {
+    cargarDatos();
+  }, []);
+
+  // Cargar favoritos guardados
+  useEffect(() => {
+    const guardados = localStorage.getItem("favoritos");
+    if (guardados) setFavoritos(JSON.parse(guardados));
+  }, []);
+
+  // Sincronizar favoritos con localStorage
+  useEffect(() => {
+    localStorage.setItem("favoritos", JSON.stringify(favoritos));
+  }, [favoritos]);
+
+  const agregarFavorito = (p: Personaje) => {
+    const yaExiste = favoritos.some((f) => f.id === p.id);
+    if (yaExiste) return; // evita duplicados
+    setFavoritos([...favoritos, { ...p, nota: "", agregadoEn: new Date().toISOString() }]);
+  };
+
+  const eliminarFavorito = (id: number) => {
+    setFavoritos(favoritos.filter((f) => f.id !== id));
+  };
+
+  const actualizarNota = (id: number, nota: string) => {
+    setFavoritos(favoritos.map((f) => (f.id === id ? { ...f, nota } : f)));
+  };
+
+  const filtrados = personajes.filter((p) =>
+    p.name.toLowerCase().includes(busqueda.toLowerCase())
+  );
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
+    <div className="app">
+      <h1>Explorador Dragon Ball</h1>
+      <Buscador valor={busqueda} onCambiar={setBusqueda} />
+
+      {cargando && <p>Cargando personajes...</p>}
+      {error && (
         <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
+          <p>{error}</p>
+          <button onClick={cargarDatos}>Reintentar</button>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      )}
+      {!cargando && !error && filtrados.length === 0 && <p>Sin coincidencias.</p>}
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <ListaElementos personajes={filtrados} onAgregar={agregarFavorito} />
+      <Favoritos
+        favoritos={favoritos}
+        onEliminar={eliminarFavorito}
+        onActualizarNota={actualizarNota}
+      />
+    </div>
+  );
 }
 
-export default App
+export default App;
